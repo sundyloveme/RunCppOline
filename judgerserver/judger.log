@@ -1,0 +1,4 @@
+FATAL [2020-05-09 08:00:18] [/home/ubuntu/Judger/src/child.c:87]Error: System errno: No such file or directory; Internal errno: DUP2_FAILED
+FATAL [2020-05-09 08:07:03] [/home/ubuntu/Judger/src/child.c:87]Error: System errno: No such file or directory; Internal errno: DUP2_FAILED
+FATAL [2020-05-09 08:11:57] [/home/ubuntu/Judger/src/child.c:87]Error: System errno: No such file or directory; Internal errno: DUP2_FAILED
+FATAL [2020-05-09 08:15:51] [/home/ubuntu/Judger/src/child.c:87]Error: System errno: No such file or directory; Internal errno: DUP2_FAILED
