@@ -24,5 +24,30 @@ class ViewTest(TestCase):
         # pdb.set_trace()
         file = open(os.path.dirname(__file__) + '/main', "r")
         user_code = file.read()
+        file.close()
         response = self.client.post('/', {"user_code": user_code, "user_input": "yyy"})
         self.assertEqual(response.content, b"Hello yyy\n")
+
+    def test_run_code2(self):
+        """
+        测试复杂的cpp代码
+        代码中包含dfs递归算法，输入中包含换行
+        """
+        file = open(os.path.dirname(__file__) + '/main2', "r")
+        user_code = file.read()
+        # file.close()
+
+        file = open(os.path.dirname(__file__) + '/input', "r")
+        user_input = file.read()
+        # file.close()
+
+        response = self.client.post('/', {"user_code": user_code, "user_input": user_input})
+        self.assertEqual(response.content, b"23\n")
+
+    def test_code_error(self):
+        file = open(os.path.dirname(__file__) + '/main3', "r")
+        user_code = file.read()
+        # file.close()
+        # TODO
+        response = self.client.post('/', {"user_code": user_code, "user_input": "sudny"})
+        # self.assertEqual(response.content, b"23\n")

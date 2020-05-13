@@ -7,6 +7,9 @@ import pdb
 
 
 class SubmitCode(forms.Form):
+    """
+    提交代码的表单
+    """
     user_code = forms.CharField(label="代码", max_length=1024, widget=forms.Textarea, required=True)
     user_input = forms.CharField(label="输入数据", max_length=1024, required=True)
 
@@ -32,11 +35,8 @@ class ProcessCodeView(View):
         """
         # 清除本地文件
         self.clear_usercode()
-
         form_data = SubmitCode(request.POST)
         if form_data.is_valid():
-            # pdb.set_trace()
-            # pdb.set_trace()
             try:
                 # 将用户提交的代码写入main.c文件中
                 code_file = open(self.code_path + "/main.cpp", "w+")
@@ -53,19 +53,14 @@ class ProcessCodeView(View):
             # 运行代码
             error_mess = self.run_usercode()
 
+            # 读取运行结果1.out文件
+            # 如果文件不存在，说明运行出错，返回错误信息
             try:
                 file1 = open(self.code_path + "/1.out", "r")
+                # file1.close()
                 return HttpResponse(file1.read())
             except FileNotFoundError:
                 return HttpResponse(error_mess)
-
-            # file1 = open(self.code_path + "/1.out", "r")
-            # file2 = open(self.code_path + "/std1.out", "r")
-            # # pdb.set_trace()
-            # if file1.read().replace("\n", "") == file2.read().replace("\n", ""):
-            #     return HttpResponse("AC")
-            # else:
-            #     return HttpResponse("Error")
         return HttpResponse("commit faild")
 
     def clear_usercode(self):
@@ -98,3 +93,4 @@ class ProcessCodeView(View):
                           seccomp_rule_name="c_cpp",
                           uid=0,
                           gid=0)
+        return ret
