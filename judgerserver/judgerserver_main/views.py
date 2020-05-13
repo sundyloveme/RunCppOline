@@ -36,6 +36,7 @@ class ProcessCodeView(View):
         form_data = SubmitCode(request.POST)
         if form_data.is_valid():
             # pdb.set_trace()
+            # pdb.set_trace()
             try:
                 # 将用户提交的代码写入main.c文件中
                 code_file = open(self.code_path + "/main.cpp", "w+")
