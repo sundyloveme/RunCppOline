@@ -1,7 +1,7 @@
-# JudgeServer
+# RunCppOline
 
 #### 介绍
-一个在线运行C++代码的web程序。
+一个在线运行C++代码的web程序。[预览](http://120.92.173.80:8080/)
 
 #### 软件架构
 - Python3.7
@@ -10,11 +10,20 @@
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.安装依赖
+```
+sudo apt-get install libseccomp-dev
+mkdir build && cd build && cmake .. && make && sudo make install
+```
+
+2.运行
+```
+sudo python manage.py runserver 0:8080
+```
 
 #### 使用说明
+
+ **1.请求和返回** 
 
 通过post请求向服务器发送代码和输入数据，post请求格式如下：
 ```
@@ -24,7 +33,18 @@
     "user_input": "your_input_data"
 }
 ```
-举例，在本地个文本文件`main`内容如下：
+
+返回两个字段，`status`表示代码运行的结果，`error`表示代码运行错误，`success`表示代码运行成功；`output`表示代码运行输出结果。
+```
+{
+    "status": "",
+    "output": "",
+}
+```
+
+ **2.举例** 
+
+在本地有个文本文件`main`内容如下：
 ```cpp
 #include<cstdio>
 #include<iostream>
@@ -36,21 +56,24 @@ int main(){
 }
 ```
 
-发送post请求举例:
+发送post请求:
+
 ```py
 file = open(os.path.dirname(__file__) + '/main', "r")
 user_code = file.read()
 file.close()
-response = client.post('/', {"user_code": user_code, "user_input": "World"})
+client.post('/', {"user_code": user_code, "user_input": "World"})
 ```
 
-返回两个字段，一个`status`表示代码运行的结果，'error'表示代码运行错误；一个‘output’表示代码运行输出结果。
+返回：
 ```
 {
-    "status": "",
-    "output": "",
+    "status": "success",
+    "output": "Hello World",
 }
+
 ```
+
 
 #### 参与贡献
 
