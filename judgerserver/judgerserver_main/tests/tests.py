@@ -1,6 +1,7 @@
 from django.test import TestCase
 import pdb
 import os
+import json
 
 
 # Create your tests here.
@@ -26,7 +27,7 @@ class ViewTest(TestCase):
         user_code = file.read()
         file.close()
         response = self.client.post('/', {"user_code": user_code, "user_input": "yyy"})
-        self.assertEqual(response.content, b"Hello yyy\n")
+        self.assertEqual(response.content, b"{\"status\": \"success\", \"output\": \"Hello yyy\\n\"}")
 
     def test_run_code2(self):
         """
@@ -35,19 +36,22 @@ class ViewTest(TestCase):
         """
         file = open(os.path.dirname(__file__) + '/main2', "r")
         user_code = file.read()
-        # file.close()
+        file.close()
 
         file = open(os.path.dirname(__file__) + '/input', "r")
         user_input = file.read()
-        # file.close()
+        file.close()
 
         response = self.client.post('/', {"user_code": user_code, "user_input": user_input})
-        self.assertEqual(response.content, b"23\n")
+        self.assertEqual(json.loads(response.content)['output'], "23\n")
 
     def test_code_error(self):
+        """
+        测试用户提交的代码有错的情况
+        """
         file = open(os.path.dirname(__file__) + '/main3', "r")
         user_code = file.read()
-        # file.close()
+        file.close()
         # TODO
         response = self.client.post('/', {"user_code": user_code, "user_input": "sudny"})
-        # self.assertEqual(response.content, b"23\n")
+        self.assertEqual(json.loads(response.content)['status'], "error")

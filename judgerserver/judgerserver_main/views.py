@@ -4,6 +4,7 @@ from django import forms
 import os
 import _judger
 import pdb
+import json
 
 
 class SubmitCode(forms.Form):
@@ -37,13 +38,13 @@ class ProcessCodeView(View):
         self.clear_usercode()
         form_data = SubmitCode(request.POST)
         if form_data.is_valid():
+            # 将用户提交的代码写入main.c文件中
+            # 将用户提交的输入数据保存到1.in中
             try:
-                # 将用户提交的代码写入main.c文件中
                 code_file = open(self.code_path + "/main.cpp", "w+")
                 code_file.write(form_data.cleaned_data['user_code'])
                 code_file.close()
 
-                # 将用户提交的输入数据保存到1.in中
                 input_file = open(self.code_path + "/1.in", "w+")
                 input_file.write(form_data.cleaned_data['user_input'])
                 input_file.close()
@@ -53,14 +54,21 @@ class ProcessCodeView(View):
             # 运行代码
             error_mess = self.run_usercode()
 
+            # 返回内容
+            content = {}
+
             # 读取运行结果1.out文件
             # 如果文件不存在，说明运行出错，返回错误信息
             try:
                 file1 = open(self.code_path + "/1.out", "r")
-                # file1.close()
-                return HttpResponse(file1.read())
+                content['status'] = "success"
+                content['output'] = file1.read()
+                file1.close()
+                return HttpResponse(json.dumps(content))
             except FileNotFoundError:
-                return HttpResponse(error_mess)
+                content['status'] = "error"
+                content['output'] = ""
+                return HttpResponse(json.dumps(content))
         return HttpResponse("commit faild")
 
     def clear_usercode(self):
