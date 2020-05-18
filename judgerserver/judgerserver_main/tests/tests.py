@@ -4,11 +4,11 @@ import os
 import json
 
 
-# Create your tests here.
-# 测试C语言代码
-# 测试C++语言代码
-# 测试输入数据中有换行
-# 测试输入的代码有错误 能不能返回错误 编译或者运行错误，请检查你的代码
+def to_str_to_json(response):
+    json_response_content = str(response.content, "utf-8")
+    json_response_content = json.loads(json_response_content)
+    return json_response_content
+
 
 class ViewTest(TestCase):
     def test_home(self):
@@ -22,12 +22,14 @@ class ViewTest(TestCase):
         """
         测试cpp代码能否通过运行
         """
-        # pdb.set_trace()
         file = open(os.path.dirname(__file__) + '/main', "r")
         user_code = file.read()
         file.close()
         response = self.client.post('/', {"user_code": user_code, "user_input": "yyy"})
-        self.assertEqual(response.content, b"{\"status\": \"success\", \"output\": \"Hello yyy\\n\"}")
+        json_response_content = str(response.content, "utf-8")
+        json_response_content = json.loads(json_response_content)
+        self.assertEqual(json_response_content['status'], 'success')
+        self.assertEqual(json_response_content['output'], 'Hello yyy\n')
 
     def test_run_code2(self):
         """
@@ -43,7 +45,9 @@ class ViewTest(TestCase):
         file.close()
 
         response = self.client.post('/', {"user_code": user_code, "user_input": user_input})
-        self.assertEqual(json.loads(response.content)['output'], "23\n")
+        # self.assertEqual(json.loads(response.content)['output'], "23\n")
+        content = to_str_to_json(response)
+        self.assertEqual(content['output'], "23\n")
 
     def test_code_error(self):
         """
@@ -52,6 +56,7 @@ class ViewTest(TestCase):
         file = open(os.path.dirname(__file__) + '/main3', "r")
         user_code = file.read()
         file.close()
-        # TODO
+
         response = self.client.post('/', {"user_code": user_code, "user_input": "sudny"})
-        self.assertEqual(json.loads(response.content)['status'], "error")
+        content = to_str_to_json(response)
+        self.assertEqual(content['status'], "error")

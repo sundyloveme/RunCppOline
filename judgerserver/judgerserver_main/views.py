@@ -73,7 +73,7 @@ class ProcessCodeView(View):
 
     def clear_usercode(self):
         # 清除user_codes文件夹下所有文件
-        os.system("sudo rm " + self.code_path + "/*")
+        os.system("rm " + self.code_path + "/*")
 
     def run_usercode(self):
         """
