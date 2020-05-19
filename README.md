@@ -75,11 +75,13 @@ client.post('/', {"user_code": user_code, "user_input": "World"})
 ```
 
 
-#### 参与贡献
+#### 开发环境搭建
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+1.安装`docker`
+
+2.拉取镜像。该镜像为该项目的开发环境。`sudo docker pull registry.cn-shanghai.aliyuncs.com/sundy-allstar/run_cpp_app:env`
+
+3.运行镜像并且将代码文件挂载入容器中。在容器中运行代码，在本地中修改代码即可。
+
 
 如有问题请发`Issues`谢谢。

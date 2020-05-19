@@ -69,10 +69,12 @@ class ProcessCodeView(View):
                 content['status'] = "error"
                 content['output'] = ""
                 return HttpResponse(json.dumps(content))
-        return HttpResponse("commit faild")
+        return HttpResponse("请提交有效数据")
 
     def clear_usercode(self):
-        # 清除user_codes文件夹下所有文件
+        """
+        清除user_codes文件夹下所有文件
+        """
         os.system("rm " + self.code_path + "/*")
 
     def run_usercode(self):
@@ -81,7 +83,6 @@ class ProcessCodeView(View):
         """
         if os.system("g++ " + self.code_path + "/main.cpp" + " -o" + self.code_path + "/main"):
             return "编译或者运行错误，请检查你的代码"
-            # exit(1)
         ret = _judger.run(max_cpu_time=1000,
                           max_real_time=2000,
                           max_memory=128 * 1024 * 1024,
