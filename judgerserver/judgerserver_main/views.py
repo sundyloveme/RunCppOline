@@ -5,7 +5,8 @@ import os
 import _judger
 import pdb
 import json
-from django.views.decorators.csrf import csrf_exempt
+# from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 
 class SubmitCode(forms.Form):
@@ -17,6 +18,7 @@ class SubmitCode(forms.Form):
 
 
 # Create your views here.
+@method_decorator(csrf_exempt, name='dispatch')
 class ProcessCodeView(View):
     """
     返回运行代码结果的视图类
@@ -31,7 +33,6 @@ class ProcessCodeView(View):
         form = SubmitCode()
         return render(request, template_name="index.html", context={'form': form})
 
-    @csrf_exempt
     def post(self, request):
         """
         返回用户代码的运行结果
