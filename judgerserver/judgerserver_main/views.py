@@ -5,6 +5,7 @@ import os
 import _judger
 import pdb
 import json
+from django.views.decorators.csrf import csrf_exempt
 
 
 class SubmitCode(forms.Form):
@@ -30,6 +31,7 @@ class ProcessCodeView(View):
         form = SubmitCode()
         return render(request, template_name="index.html", context={'form': form})
 
+    @csrf_exempt
     def post(self, request):
         """
         返回用户代码的运行结果
