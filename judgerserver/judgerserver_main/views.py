@@ -1,4 +1,5 @@
 from django.shortcuts import render, HttpResponse
+from django.http import JsonResponse
 from django.views import View
 from django import forms
 import os
@@ -13,11 +14,11 @@ class SubmitCode(forms.Form):
     """
     提交代码的表单
     """
-    user_code = forms.CharField(label="代码", max_length=1024, widget=forms.Textarea, required=True)
+    user_code = forms.CharField(label="代码", max_length=1024,
+                                widget=forms.Textarea, required=True)
     user_input = forms.CharField(label="输入数据", max_length=1024, required=True)
 
 
-# Create your views here.
 @method_decorator(csrf_exempt, name='dispatch')
 class ProcessCodeView(View):
     """
@@ -31,7 +32,8 @@ class ProcessCodeView(View):
         渲染出请求用户代码的表单页面
         """
         form = SubmitCode()
-        return render(request, template_name="index.html", context={'form': form})
+        return render(request, template_name="index.html",
+                      context={'form': form})
 
     def post(self, request):
         """
@@ -43,19 +45,15 @@ class ProcessCodeView(View):
         if form_data.is_valid():
             # 将用户提交的代码写入main.c文件中
             # 将用户提交的输入数据保存到1.in中
-            try:
-                code_file = open(self.code_path + "/main.cpp", "w+")
-                code_file.write(form_data.cleaned_data['user_code'])
-                code_file.close()
-
-                input_file = open(self.code_path + "/1.in", "w+")
-                input_file.write(form_data.cleaned_data['user_input'])
-                input_file.close()
-            except KeyError:
-                return HttpResponse("请提供代码和输入数据")
+            with open(self.code_path + "/main.cpp", "w+",
+                      encoding="utf-8") as code_file:
+                user_code_1 = form_data.cleaned_data.get('user_code')
+                code_file.write(user_code_1)
+            with open(self.code_path + "/1.in", "w+") as input_file:
+                input_file.write(form_data.cleaned_data.get('user_input'))
 
             # 运行代码
-            error_mess = self.run_usercode()
+            self.run_usercode()
 
             # 返回内容
             content = {}
@@ -67,11 +65,11 @@ class ProcessCodeView(View):
                 content['status'] = "success"
                 content['output'] = file1.read()
                 file1.close()
-                return HttpResponse(json.dumps(content))
+                return JsonResponse(content)
             except FileNotFoundError:
                 content['status'] = "error"
                 content['output'] = ""
-                return HttpResponse(json.dumps(content))
+                return JsonResponse(content)
         return HttpResponse("请提交有效数据")
 
     def clear_usercode(self):
@@ -84,7 +82,8 @@ class ProcessCodeView(View):
         """
         运行用户代码
         """
-        if os.system("g++ " + self.code_path + "/main.cpp" + " -o" + self.code_path + "/main"):
+        if os.system(
+                "g++ " + self.code_path + "/main.cpp" + " -o" + self.code_path + "/main"):
             return "编译或者运行错误，请检查你的代码"
         ret = _judger.run(max_cpu_time=1000,
                           max_real_time=2000,

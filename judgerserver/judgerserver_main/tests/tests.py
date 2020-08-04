@@ -25,7 +25,8 @@ class ViewTest(TestCase):
         file = open(os.path.dirname(__file__) + '/main', "r")
         user_code = file.read()
         file.close()
-        response = self.client.post('/', {"user_code": user_code, "user_input": "yyy"})
+        response = self.client.post('/', {"user_code": user_code,
+                                          "user_input": "yyy"})
         json_response_content = str(response.content, "utf-8")
         json_response_content = json.loads(json_response_content)
         self.assertEqual(json_response_content['status'], 'success')
@@ -44,7 +45,8 @@ class ViewTest(TestCase):
         user_input = file.read()
         file.close()
 
-        response = self.client.post('/', {"user_code": user_code, "user_input": user_input})
+        response = self.client.post('/', {"user_code": user_code,
+                                          "user_input": user_input})
         # self.assertEqual(json.loads(response.content)['output'], "23\n")
         content = to_str_to_json(response)
         self.assertEqual(content['output'], "23\n")
@@ -57,6 +59,34 @@ class ViewTest(TestCase):
         user_code = file.read()
         file.close()
 
-        response = self.client.post('/', {"user_code": user_code, "user_input": "sudny"})
+        response = self.client.post('/', {"user_code": user_code,
+                                          "user_input": "sudny"})
         content = to_str_to_json(response)
         self.assertEqual(content['status'], "error")
+
+    def test_code_empty(self):
+        """
+        测试用户提供的数据为空 或者不存在 user_code和user_input字段
+        """
+        file = open(os.path.dirname(__file__) + '/main', "r")
+        user_code = file.read()
+        file.close()
+
+        response = self.client.post('/', {"user_code": "",
+                                          "user_input": ""})
+        content = response.content.decode("utf-8")
+        self.assertEqual(content, "请提交有效数据")
+
+    def test_code_contain_zh(self):
+        """
+        测试用户代码中包含中文
+        """
+        file = open(os.path.dirname(__file__) + '/main4', "r", encoding="utf-8")
+        user_code = file.read()
+        file.close()
+        response = self.client.post('/', {"user_code": user_code,
+                                          "user_input": "yyy"})
+        json_response_content = str(response.content, "utf-8")
+        json_response_content = json.loads(json_response_content)
+        self.assertEqual(json_response_content['status'], 'success')
+        self.assertEqual(json_response_content['output'], 'Hello yyy\n')
